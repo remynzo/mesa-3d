@@ -77,11 +77,13 @@ func build_ui() -> void:
 
 	build_camera_panel(ui)
 	build_settings(ui)
+	build_help(ui)
 
 	file_dialog = FileDialog.new()
 	file_dialog.access = FileDialog.ACCESS_FILESYSTEM
 	file_dialog.use_native_dialog = true
 	file_dialog.file_selected.connect(func(path: String) -> void: file_callback.call(path))
+	file_dialog.files_selected.connect(func(paths: PackedStringArray) -> void: file_callback.call(paths))
 	layer.add_child(file_dialog)
 
 
@@ -140,6 +142,9 @@ func build_top_bar(ui: Control) -> void:
 	fps_label.custom_minimum_size.x = 150
 	fps_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	hb.add_child(fps_label)
+	var ajuda_btn := Tema.botao(Tema.I_AJUDA, "", "Ajuda: o que cada parte faz")
+	ajuda_btn.pressed.connect(func() -> void: help_panel.visible = not help_panel.visible)
+	hb.add_child(ajuda_btn)
 	var cfg_btn := Tema.botao(Tema.I_CONFIG, "", "Configurações de qualidade (Esc)")
 	cfg_btn.pressed.connect(toggle_settings)
 	hb.add_child(cfg_btn)
@@ -185,9 +190,7 @@ func build_context(ui: Control) -> void:
 	name_edit.placeholder_text = "nome da peça"
 	nova.add_child(name_edit)
 	perso_opt = OptionButton.new()
-	perso_opt.add_item("Peça simples")
-	for nome: String in personagens:
-		perso_opt.add_item(nome)
+	refresh_characters()
 	perso_opt.selected = mini(1, perso_opt.item_count - 1)
 	perso_opt.focus_mode = Control.FOCUS_NONE
 	perso_opt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -200,6 +203,9 @@ func build_context(ui: Control) -> void:
 	hb.add_child(perso_opt)
 	hb.add_child(color_btn)
 	nova.add_child(hb)
+	var add := Tema.botao(Tema.I_IMAGEM, "Adicionar personagem…", "Escolha uma ou mais imagens (png, jpg, webp) — ou arraste pra janela. Cada imagem vira uma variação; uma com \"costas\" no nome vira as costas. O nome vem do arquivo.")
+	add.pressed.connect(ask_file.bind(FileDialog.FILE_MODE_OPEN_FILES, PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; Imagens"]), on_add_character))
+	nova.add_child(add)
 
 
 	var amb := ctx_box(raiz, Mode.SCENE, "Ambientar", "Clique no chão pra pôr · arraste pra mover · botão direito apaga.")
@@ -222,6 +228,84 @@ func build_context(ui: Control) -> void:
 		b.button_pressed = i == 0
 		b.pressed.connect(func() -> void: prop_opt.select(i))
 		g.add_child(b)
+
+
+func refresh_characters() -> void:
+	perso_opt.clear()
+	perso_opt.add_item("Peça simples")
+	var nomes := personagens.keys()
+	nomes.sort()
+	for nome: String in nomes:
+		perso_opt.add_item(nome)
+
+
+func on_add_character(files: PackedStringArray) -> void:
+	var nome := add_character(files)
+	if nome == "":
+		show_msg("Nenhuma imagem (png, jpg, webp) pra virar personagem")
+		return
+	refresh_characters()
+	for i in perso_opt.item_count:
+		if perso_opt.get_item_text(i) == nome:
+			perso_opt.select(i)
+	name_edit.text = nome.capitalize()
+	set_mode(Mode.NEW)
+	show_msg("Personagem \"%s\" pronto: clique no chão pra colocar" % nome)
+
+
+# Boas-vindas: o que cada parte faz, em poucas linhas. Abre sozinho só na primeira vez.
+func build_help(ui: Control) -> void:
+	help_panel = PanelContainer.new()
+	help_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	help_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	help_panel.grow_vertical = Control.GROW_DIRECTION_BOTH
+	help_panel.add_theme_stylebox_override("panel", Tema.caixa(Tema.FUNDO, Tema.AMBAR * Color(1, 1, 1, 0.5), 14, 22))
+	help_panel.hide()
+	ui.add_child(help_panel)
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 10)
+	vb.custom_minimum_size.x = 600
+	help_panel.add_child(vb)
+	var t := Tema.titulo("Bem-vindo à Mesa 3D", Tema.AMBAR)
+	t.add_theme_font_size_override("font_size", 22)
+	vb.add_child(t)
+	var linhas := [
+		[Tema.I_CURSOR, "Peças", "clique seleciona, arraste move. Segure o botão direito e solte pra mandar andar."],
+		[Tema.I_NOVA, "Nova peça", "escolha nome, personagem e cor e clique no chão. \"Adicionar personagem\" usa as suas imagens (ou arraste as imagens pra janela)."],
+		[Tema.I_AMBIENTAR, "Ambientar", "tochas, fogo, neblina, vaga-lumes, sigilos… clique no chão pra pôr."],
+		[Tema.I_VOAR, "Voar (Tab)", "ande pelo mapa com WASD, como num jogo."],
+		[Tema.I_CAMERA, "Câmera dos jogadores", "abra a \"Janela dos jogadores\" e leve pro segundo monitor, OBS ou Discord. C traz a câmera pra sua vista; Ctrl+1…9 grava planos e 1…9 chama."],
+		[Tema.I_CENARIO, "Cenário", "troque por qualquer modelo .glb (ou arraste pra janela). \"Salvar\" guarda tudo num .json."],
+	]
+	for l in linhas:
+		var hb := HBoxContainer.new()
+		hb.add_theme_constant_override("separation", 12)
+		var ic := Tema.icone(l[0], 18, Tema.AMBAR)
+		ic.custom_minimum_size.x = 26
+		hb.add_child(ic)
+		var txt := RichTextLabel.new()
+		txt.bbcode_enabled = true
+		txt.add_theme_font_override("bold_font", Tema.fonte_forte)
+		txt.fit_content = true
+		txt.scroll_active = false
+		txt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		txt.text = "[b]%s:[/b] %s" % [l[1], l[2]]
+		hb.add_child(txt)
+		vb.add_child(hb)
+	var dica := Label.new()
+	dica.text = "Esta ajuda volta no botão ? lá em cima. Esc abre as configurações de qualidade."
+	dica.add_theme_color_override("font_color", Tema.APAGADO)
+	dica.add_theme_font_size_override("font_size", 13)
+	vb.add_child(dica)
+	var ok := Button.new()
+	ok.text = "Começar"
+	ok.size_flags_horizontal = Control.SIZE_SHRINK_END
+	ok.custom_minimum_size = Vector2(140, 38)
+	ok.pressed.connect(func() -> void:
+		help_panel.hide()
+		ajuda_vista = true
+		save_config())
+	vb.add_child(ok)
 
 
 func ctx_box(raiz: VBoxContainer, m: Mode, titulo: String, dica: String) -> VBoxContainer:
@@ -303,6 +387,7 @@ func load_config() -> void:
 		cfg.preset = "Médio"
 		for k in cfg.keys():
 			cfg[k] = cf.get_value("qualidade", k, cfg[k])
+		ajuda_vista = cf.get_value("geral", "ajuda_vista", false)
 	apply_config()
 	save_config()
 
@@ -313,6 +398,7 @@ func save_config() -> void:
 	var cf := ConfigFile.new()
 	for k in cfg:
 		cf.set_value("qualidade", k, cfg[k])
+	cf.set_value("geral", "ajuda_vista", ajuda_vista)
 	cf.save(CFG_PATH)
 
 

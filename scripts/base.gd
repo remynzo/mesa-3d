@@ -13,6 +13,9 @@ const TOKEN_ALTURA := 1.8
 const CELL := 1.5
 const WALK_SPEED := 3.0
 const CFG_PATH := "user://config.cfg"
+const EXEMPLO := "res://cenarios/capela_mesa.json"
+const PERSO_USUARIO := "user://personagens"   # personagens adicionados pela tela
+const IMAGENS := ["png", "webp", "jpg", "jpeg"]
 const LAYER_MAP := 1
 const LAYER_PIECE := 2
 # camadas de visão: o mestre vê WORLD+MASTER, os jogadores WORLD+PLAYER
@@ -29,7 +32,7 @@ enum Mode { FLY, PIECES, NEW, SCENE }
 
 const HELP := {
 	Mode.FLY: "VOAR — WASD anda · Espaço sobe · Shift desce · segure Ctrl pra ir rápido · rodinha muda a velocidade · Tab volta pras peças",
-	Mode.PIECES: "PEÇAS — clique seleciona · clique numa porta (ou na geladeira do bar) abre e fecha · Shift+clique soma · arraste no vazio pra pegar várias · arraste a peça pra mover · segure o botão direito e solte pra mandar andar · B troca a variação · Q/E gira · Delete apaga · Ctrl+Z desfaz · Tab voa",
+	Mode.PIECES: "PEÇAS — clique seleciona · clique numa porta abre e fecha · Shift+clique soma · arraste no vazio pra pegar várias · arraste a peça pra mover · segure o botão direito e solte pra mandar andar · B troca a variação · Q/E gira · Delete apaga · Ctrl+Z desfaz · Tab voa",
 	Mode.NEW: "NOVA PEÇA — clique no chão coloca a peça com o nome, personagem e cor do painel · B troca a variação · Tab voa",
 	Mode.SCENE: "AMBIENTAR — escolha no painel e clique no chão · arraste pra mover · botão direito apaga · Tab voa",
 }
@@ -95,6 +98,8 @@ var msg_panel: PanelContainer
 var mode_label: Label
 var preset_opt: OptionButton
 var file_dialog: FileDialog
+var help_panel: PanelContainer   # boas-vindas: abre sozinho na primeira vez e no botão "?"
+var ajuda_vista := false
 var file_callback: Callable
 
 var piece_mesh := CylinderMesh.new()

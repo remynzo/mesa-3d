@@ -815,7 +815,7 @@ for nome, var, x, y, giro in [("Arqueiro", "arco", -0.9, -6.5, 0.0), ("Vigia", "
     p.update({"nome": nome, "cor": "8a6d4a", "perso": "arqueiro", "var": var, "giro": giro})
     pecas.append(p)
 mesa = {
-    "cenario": os.path.abspath(glb),
+    "cenario": os.path.basename(glb),   # relativo: a mesa fica na mesma pasta do .glb
     "clima": "Entardecer com neblina",
     "pecas": pecas,
     "objetos": [dict(tipo=o[0], **G(o[1], o[2], o[3] if len(o) > 3 else 0.0)) for o in objetos],

@@ -75,8 +75,12 @@ func _ready() -> void:
 			run_table_photos(args)
 		else:
 			load_table(args[args.find("--mesa") + 1])
-	else:
-		make_default_ground()
+	else:   # aberto sem nada: mesa de exemplo (a capela) e, na primeira vez, a ajuda
+		if FileAccess.file_exists(EXEMPLO):
+			load_table(EXEMPLO)
+		else:
+			make_default_ground()
+		help_panel.visible = not ajuda_vista
 
 
 func _input(event) -> void:
@@ -280,3 +284,5 @@ func _on_files_dropped(files: PackedStringArray) -> void:
 		load_scenario(files[0])
 	elif ext == "json":
 		load_table(files[0])
+	elif ext in IMAGENS:
+		on_add_character(files)

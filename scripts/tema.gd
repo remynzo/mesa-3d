@@ -36,6 +36,8 @@ static var I_DESFAZER := char(0xf2ea)
 static var I_REFAZER := char(0xf2f9)
 static var I_DADO := char(0xf6cf)
 static var I_FECHAR := char(0xf00d)
+static var I_AJUDA := char(0xf059)
+static var I_IMAGEM := char(0xf03e)
 
 
 static func caixa(cor: Color, borda := Color(0, 0, 0, 0), raio := 6, margem := 8.0) -> StyleBoxFlat:

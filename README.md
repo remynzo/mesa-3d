@@ -17,6 +17,7 @@ Feita em [Godot 4](https://godotengine.org) · cenários gerados por código no 
 |---|---|
 | 🎥 **Duas janelas** | A tela do mestre tem painéis, grade e nomes. A janela dos jogadores só tem a imagem e pode ir pro segundo monitor, pro OBS ou pro Discord (**F11** = tela cheia). |
 | 🎬 **Câmera dos jogadores** | **C** leva a câmera pra onde você está olhando, com transição suave ou corte seco. Grave até 9 planos (**Ctrl+1…9**) e chame com **1…9**. Ela também segue uma peça e treme (susto, explosão). |
+| 🧙 **Seus personagens** | Botão **Adicionar personagem…** (ou arraste as imagens pra janela): cada imagem vira uma variação, e uma com "costas" no nome vira as costas. |
 | ♟️ **Peças** | Arraste pra mover. Segure o botão direito e solte pra mandar andar (a linha mostra os metros). Arraste no vazio pra pegar várias. |
 | 🔥 **Ambientar** | Clique no chão pra pôr tocha, fogueira, lanterna, luz mágica, vela, fumaça, brasas, vaga-lumes, neblina rasteira, sigilos girando… |
 | 🌫️ **Climas** | Noite com neblina, floresta sombria, entardecer, dia nublado, noite na cidade. A câmera dos jogadores tem neblina volumétrica, profundidade de campo e granulação. |
@@ -48,7 +49,7 @@ cd mesa-3d
 godot --path . -- --mesa cenarios/capela_mesa.json
 ```
 
-Sem argumentos, ela abre um chão vazio. Para trocar de cenário, use o botão **Cenário** ou arraste um `.glb` pra janela.
+Aberta sem nada (`godot --path .`), ela carrega a capela de exemplo e mostra uma ajuda curta na primeira vez; o botão **?** traz a ajuda de volta. Para trocar de cenário, use o botão **Cenário** ou arraste um `.glb` pra janela.
 
 ## Controles
 
@@ -80,7 +81,9 @@ blender -b -P cenarios/capela.py -- cenarios
 
 > Os modelos baixados que ele usa (Poly Haven, CC0) não estão no repositório. O `capela.glb` pronto está.
 
-Personagens ficam em `personagens/<nome>/`, uma imagem por variação (`arco.webp`, `capuz.webp`…), mais `costas.webp` para as costas. Sem essa pasta, as peças viram fichas simples.
+Personagens adicionados pela tela ficam na pasta de dados do Godot (`user://personagens/`). Também dá pra pôr direto em `personagens/<nome>/` no projeto: uma imagem por variação (`arco.webp`, `capuz.webp`…), mais `costas.webp` para as costas. Sem personagem, a peça vira uma ficha simples.
+
+A mesa salva (`.json`) guarda o cenário com caminho relativo quando ele está na mesma pasta: leve a pasta junto e ela abre em outro PC.
 
 ## Testes
 

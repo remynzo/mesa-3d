@@ -77,13 +77,17 @@ func add_piece(nome: String, color: Color, pos: Vector3, perso := "", varia := "
 
 
 func load_characters() -> void:
-	var root := ProjectSettings.globalize_path("res://personagens")
+	for r in ["res://personagens", PERSO_USUARIO]:   # os do projeto e os que a pessoa adicionou pela tela
+		load_characters_at(ProjectSettings.globalize_path(r))
+
+
+func load_characters_at(root: String) -> void:
 	if not DirAccess.dir_exists_absolute(root):
 		return   # sem personagens: as peças viram fichas simples
 	for nome in DirAccess.get_directories_at(root):
 		var files := {}
 		for f in DirAccess.get_files_at(root.path_join(nome)):
-			if f.get_extension().to_lower() in ["png", "webp", "jpg", "jpeg"]:
+			if f.get_extension().to_lower() in IMAGENS:
 				files[f.get_basename()] = root.path_join(nome).path_join(f)
 		var keys := files.keys()
 		keys.sort()
@@ -96,6 +100,37 @@ func load_characters() -> void:
 			vars[k] = [front, load_tex(back) if back != "" else front]
 		if not vars.is_empty():
 			personagens[nome] = vars
+
+
+# Personagem novo a partir de imagens escolhidas na tela ou arrastadas pra janela: copia pra pasta do usuário.
+# O nome vem do primeiro arquivo ("guerreiro.png" + "guerreiro_costas.png" = personagem "guerreiro").
+# Devolve o nome, ou "" se nenhuma imagem servia.
+func add_character(files: PackedStringArray) -> String:
+	var imgs: Array[String] = []
+	for f in files:
+		if f.get_extension().to_lower() in IMAGENS:
+			imgs.append(f)
+	if imgs.is_empty():
+		return ""
+	imgs.sort()
+	var nome := imgs[0].get_file().get_basename().to_lower()
+	for f in imgs:
+		if not f.get_file().get_basename().to_lower().ends_with("costas"):
+			nome = f.get_file().get_basename().to_lower()
+			break
+	nome = nome.trim_suffix("_costas").validate_filename()
+	var pasta := ProjectSettings.globalize_path(PERSO_USUARIO).path_join(nome)
+	DirAccess.make_dir_recursive_absolute(pasta)
+	for f in imgs:
+		var destino := pasta.path_join(f.get_file().to_lower())
+		if f != destino:
+			DirAccess.copy_absolute(f, destino)
+	for k in token_cache.keys():   # imagem trocada com o mesmo nome: esquece a velha
+		if str(k).begins_with(pasta) or str(k).begins_with(nome + "/"):
+			token_cache.erase(k)
+	personagens.erase(nome)
+	load_characters_at(ProjectSettings.globalize_path(PERSO_USUARIO))
+	return nome if personagens.has(nome) else ""
 
 
 # ponytail: carrega todas as imagens na abertura; carregar sob demanda se tiver dezenas de personagens

@@ -216,6 +216,7 @@ func run_photo_test(args: PackedStringArray) -> void:
 		ok = await test_characters(out) and ok
 	else:
 		print("sem a pasta personagens/arqueiro: pulei os testes de personagem")
+	ok = await test_para_todos(out) and ok
 
 	print("TUDO OK" if ok else "FALHOU")
 	get_tree().quit(0 if ok else 1)
@@ -331,6 +332,9 @@ func run_table_photos(args: PackedStringArray) -> void:
 	toggle_settings()
 	await shot(out + "/ui_config.png")
 	toggle_settings()
+	help_panel.show()
+	await shot(out + "/ui_ajuda_mesa.png")
+	help_panel.hide()
 	jog.smooth = false
 	var vistas := {
 		"entrada": [Vector3(2.5, 1.7, 14.0), Vector3(-0.5, 3.0, -10.0)],
@@ -455,3 +459,50 @@ func run_load_test(args: PackedStringArray) -> void:
 	print("+ clima noite e 20 luzes/efeitos: %4d FPS  %4d desenhos" % fx)
 	print("(as duas janelas abertas: mestre %s, jogadores %s)" % [get_window().size, jog.size])
 	get_tree().quit()
+
+
+# O que deixa o programa usável por qualquer um: mesa salva com caminho relativo, personagem novo a partir
+# de imagens e a ajuda de boas-vindas cabendo na tela.
+func test_para_todos(out: String) -> bool:
+	var ok := true
+	# 1) mesa salva na pasta do cenário guarda só o nome do arquivo e abre de novo
+	var mesa := ProjectSettings.globalize_path(scenario_path).get_base_dir().path_join("_mesa_teste.json")
+	save_table(mesa)
+	var salvo: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(mesa))
+	ok = check("mesa salva guarda o cenário relativo (%s)" % salvo.cenario, salvo.cenario == scenario_path.get_file()) and ok
+	var antes := scenario_path
+	scenario_path = ""   # força recarregar o cenário pelo caminho relativo
+	await load_table(mesa)
+	ok = check("mesa com caminho relativo abre o cenário (%s)" % scenario_path, scenario_path == antes) and ok
+	DirAccess.remove_absolute(mesa)
+	# 2) personagem novo: duas imagens (frente vermelha, costas azul) viram um personagem com costas
+	var img := Image.create(64, 128, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0.8, 0.1, 0.1))
+	img.save_png(out + "/Teste_Heroi.png")
+	img.fill(Color(0.1, 0.2, 0.8))
+	img.save_png(out + "/Teste_Heroi_costas.png")
+	var nome := add_character(PackedStringArray([out + "/Teste_Heroi_costas.png", out + "/Teste_Heroi.png"]))
+	var vars: Dictionary = personagens.get(nome, {})
+	ok = check("imagens viram personagem \"%s\" com 1 variação e costas diferentes" % nome, nome == "teste_heroi" and vars.size() == 1 and vars.has("teste_heroi") and vars.teste_heroi[0] != vars.teste_heroi[1]) and ok
+	on_add_character(PackedStringArray([out + "/Teste_Heroi.png"]))
+	ok = check("o personagem aparece na lista de Nova peça e fica escolhido", perso_opt.get_item_text(perso_opt.selected) == "teste_heroi") and ok
+	var p := add_piece("Herói", Color.RED, on_ground(Vector3(0, 5, 0)), "teste_heroi")
+	ok = check("peça com o personagem novo usa a imagem dele", p.get_meta("perso") == "teste_heroi") and ok
+	delete_selected()
+	pieces.remove_child(p)
+	p.queue_free()
+	var pasta := ProjectSettings.globalize_path(PERSO_USUARIO).path_join("teste_heroi")   # não deixa lixo na pasta de quem usa
+	for f in DirAccess.get_files_at(pasta):
+		DirAccess.remove_absolute(pasta.path_join(f))
+	DirAccess.remove_absolute(pasta)
+	personagens.erase("teste_heroi")
+	refresh_characters()
+	# 3) ajuda de boas-vindas cabe na janela
+	set_mode(Mode.PIECES)
+	help_panel.show()
+	await get_tree().process_frame
+	await shot(out + "/ui_ajuda.png")
+	var tela := get_viewport().get_visible_rect()
+	ok = check("ajuda cabe na tela (%s em %s)" % [help_panel.get_global_rect().size, tela.size], tela.encloses(help_panel.get_global_rect())) and ok
+	help_panel.hide()
+	return ok

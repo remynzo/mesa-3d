@@ -48,7 +48,13 @@ func save_table(path: String) -> void:
 	if f == null:
 		show_msg("Não consegui salvar em " + path)
 		return
-	f.store_string(JSON.stringify(table_dict(), "\t", true, true))
+	var d := table_dict()
+	# cenário na mesma pasta da mesa (ou dentro dela) vai com caminho relativo: a mesa abre em outro PC se a pasta for junto
+	var pasta := path.get_base_dir() + "/"
+	var cen := ProjectSettings.globalize_path(d.cenario)
+	if cen.begins_with(pasta):
+		d.cenario = cen.trim_prefix(pasta)
+	f.store_string(JSON.stringify(d, "\t", true, true))
 	show_msg("Mesa salva: " + path.get_file())
 
 
@@ -61,7 +67,9 @@ func load_table(path: String) -> void:
 		show_msg("Arquivo de mesa inválido")
 		return
 	var cen: String = data.get("cenario", "")
-	if cen != "" and cen != scenario_path:
+	if cen != "" and cen.is_relative_path():   # relativo à pasta da mesa
+		cen = path.get_base_dir().path_join(cen)
+	if cen != "" and ProjectSettings.localize_path(cen) != scenario_path:
 		await load_scenario(cen)
 	apply_state(data)
 	set_clima(data.get("clima", visual.clima))

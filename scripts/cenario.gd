@@ -32,7 +32,7 @@ func load_scenario(path: String) -> void:
 		scenario.remove_child(c)
 		c.queue_free()
 	scenario.add_child(scene)
-	scenario_path = path
+	scenario_path = local if local.begins_with("res://") else path
 	var max_tex: int = cfg.textura
 	var done := {}
 	var lotes := {}   # [malha, pedaço do mapa] -> posições das cópias "deco_*"
