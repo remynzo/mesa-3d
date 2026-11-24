@@ -1,0 +1,3 @@
+Fira Sans: SIL Open Font License 1.1 (Mozilla/Carrois).
+icones.otf = Font Awesome 7 Free Solid: SIL Open Font License 1.1 (Fonticons).
+Copiadas das fontes do sistema pra o programa funcionar em qualquer PC.

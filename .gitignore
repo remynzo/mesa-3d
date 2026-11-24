@@ -1,0 +1,17 @@
+# gerado / local
+provas/
+.godot/
+override.cfg
+__pycache__/
+*.bak
+# modelos baixados e texturas geradas (1,8 GB, ficam só no PC)
+assets/
+# cenário da Base da Ordo Realitas: fica fora do repositório
+cenarios/base*
+cenarios/checar_base.py
+# chaves, por garantia
+.env*
+*.key
+*.pem
+# personagens (tokens) ficam só no PC
+personagens/
