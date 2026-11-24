@@ -41,7 +41,14 @@ Feita em [Godot 4](https://godotengine.org) · cenários gerados por código no 
 
 ## Como rodar
 
-Precisa do **Godot 4.7** (Forward+).
+**Jeito fácil:** baixe a versão pronta na [página de versões](https://github.com/remynzo/mesa-3d/releases/latest):
+
+- **Windows:** `Mesa3D-windows.zip` → descompacte e abra `Mesa3D.exe`. Se o Windows avisar "app desconhecido", clique em *Mais informações* → *Executar assim mesmo*.
+- **Linux:** `Mesa3D-linux.zip` → descompacte e abra `Mesa3D.x86_64`. Se não abrir, marque como executável: `chmod +x Mesa3D.x86_64`.
+
+Precisa de placa de vídeo com Vulkan. Em PC fraco, abra as configurações (**Esc**) e ligue o *Modo leve (OpenGL)*.
+
+**Pelo código:** precisa do **Godot 4.7** (Forward+).
 
 ```bash
 git clone https://github.com/remynzo/mesa-3d.git
