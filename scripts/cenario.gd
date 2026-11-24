@@ -1,4 +1,4 @@
-extends "res://base.gd"
+extends "res://scripts/base.gd"
 ## Cenário: carregar o .glb, mato em lotes, grade e câmera do mestre.
 
 

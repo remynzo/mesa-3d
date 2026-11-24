@@ -1,4 +1,4 @@
-extends "res://camera.gd"
+extends "res://scripts/camera.gd"
 ## Mesa: aplicar estado, desfazer/refazer, salvar e abrir.
 
 

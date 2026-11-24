@@ -1,4 +1,4 @@
-extends "res://cenario.gd"
+extends "res://scripts/cenario.gd"
 ## Peças e personagens: criar, selecionar, arrastar, mandar andar.
 
 

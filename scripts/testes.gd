@@ -1,4 +1,4 @@
-extends "res://interface.gd"
+extends "res://scripts/interface.gd"
 ## Testes automáticos (--foto, --fotos, --carga).
 
 
@@ -399,9 +399,7 @@ func test_doors(out: String) -> bool:
 			if nome in mi.name:
 				alvo = mi
 		if alvo == null:
-			print("  CLIQUE: não achei %s" % nome)
-			ruins += 1
-			continue
+			continue   # cenário sem essa porta (a capela não tem nenhuma)
 		var c := alvo.global_transform * alvo.get_aabb().get_center()
 		var frente := alvo.global_transform.basis.z.normalized()   # o -y do Blender vira +z: frente da geladeira, corredor da porta
 		var de := c + frente * 1.5 + Vector3.UP * 0.3

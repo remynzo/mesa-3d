@@ -1,4 +1,4 @@
-extends "res://mesa.gd"
+extends "res://scripts/mesa.gd"
 ## Barra de botões, modos e configurações de qualidade.
 
 

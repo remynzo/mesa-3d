@@ -1,4 +1,4 @@
-extends "res://pecas.gd"
+extends "res://scripts/pecas.gd"
 ## Painel da câmera dos jogadores: prévia, planos, seguir.
 
 

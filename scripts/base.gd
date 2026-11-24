@@ -4,11 +4,11 @@ extends Node3D
 ## Assim todos enxergam o mesmo estado sem passar referência pra lá e pra cá.
 
 
-const Jogadores = preload("res://jogadores.gd")
-const Visual = preload("res://visual.gd")
-const MenuRedondo = preload("res://menu_redondo.gd")
-const Tema = preload("res://tema.gd")
-const TOKEN_SHADER = preload("res://token.gdshader")
+const Jogadores = preload("res://scripts/jogadores.gd")
+const Visual = preload("res://scripts/visual.gd")
+const MenuRedondo = preload("res://scripts/menu_redondo.gd")
+const Tema = preload("res://scripts/tema.gd")
+const TOKEN_SHADER = preload("res://scripts/token.gdshader")
 const TOKEN_ALTURA := 1.8
 const CELL := 1.5
 const WALK_SPEED := 3.0

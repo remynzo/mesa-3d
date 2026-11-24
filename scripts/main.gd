@@ -1,4 +1,4 @@
-extends "res://testes.gd"
+extends "res://scripts/testes.gd"
 ## Mesa 3D de RPG: cenário .glb, peças, névoa e configurações de qualidade.
 ## Testes: godot --path . -- --foto /caminho/teste.glb   |   -- --carga [cenario.glb] [--preset Baixo]
 ## Aqui: abertura, entrada do mouse/teclado e o laço de cada quadro. O resto está nos arquivos da corrente (veja base.gd).
