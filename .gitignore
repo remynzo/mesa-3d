@@ -15,3 +15,4 @@ cenarios/checar_base.py
 *.pem
 # personagens (tokens) ficam só no PC
 personagens/
+build/
