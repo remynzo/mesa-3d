@@ -78,6 +78,8 @@ func add_piece(nome: String, color: Color, pos: Vector3, perso := "", varia := "
 
 func load_characters() -> void:
 	var root := ProjectSettings.globalize_path("res://personagens")
+	if not DirAccess.dir_exists_absolute(root):
+		return   # sem personagens: as peças viram fichas simples
 	for nome in DirAccess.get_directories_at(root):
 		var files := {}
 		for f in DirAccess.get_files_at(root.path_join(nome)):

@@ -212,6 +212,18 @@ func run_photo_test(args: PackedStringArray) -> void:
 	await get_tree().create_timer(0.8).timeout
 	await shot(out + "/foto_mestre_noite.png")
 
+	if personagens.has("arqueiro"):
+		ok = await test_characters(out) and ok
+	else:
+		print("sem a pasta personagens/arqueiro: pulei os testes de personagem")
+
+	print("TUDO OK" if ok else "FALHOU")
+	get_tree().quit(0 if ok else 1)
+
+
+# Personagens de papel (precisa de personagens/arqueiro com arco, capuz e lanterna; a pasta não vai pro GitHub).
+func test_characters(out: String) -> bool:
+	var ok := true
 	# ---- personagens de papel ----
 	set_clima("Dia nublado")
 	visual.grain.visible = false
@@ -288,9 +300,7 @@ func run_photo_test(args: PackedStringArray) -> void:
 	await shot(out + "/foto_menu.png")
 	ok = check("menu abre com uma opção por variação", menu.get_child_count() == 1 + personagens.arqueiro.size()) and ok
 	menu.fechar()
-
-	print("TUDO OK" if ok else "FALHOU")
-	get_tree().quit(0 if ok else 1)
+	return ok
 
 
 # Fotos de uma mesa pronta pra conferir o cenário: -- --mesa x.json --fotos [--preset Alto]
